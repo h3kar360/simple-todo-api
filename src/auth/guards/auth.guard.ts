@@ -13,16 +13,23 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest();
     const authorization = request.headers.authorization;
+
+    if (!authorization) {
+      throw new UnauthorizedException('No authorization header');
+    }
+
     const token = authorization.split(' ')[1];
 
     if (!token) throw new UnauthorizedException();
 
     try {
       const tokenPayload = await this.jwtService.verifyAsync(token);
+
       request.user = {
-        userId: tokenPayload.userId,
+        userId: tokenPayload.sub,
         username: tokenPayload.username,
       };
+
       return true;
     } catch (error) {
       throw new UnauthorizedException();

@@ -5,6 +5,8 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BcryptService } from '../common/services/bcrypt.service';
+import { DatabaseModule } from '../database/database.module';
+import { refreshProviders } from './auth.providers';
 
 @Module({
   imports: [
@@ -14,12 +16,14 @@ import { BcryptService } from '../common/services/bcrypt.service';
       useFactory: async (configService: ConfigService) => ({
         global: true,
         secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: '1d' },
+        signOptions: { expiresIn: '15m' },
       }),
       inject: [ConfigService],
     }),
+    DatabaseModule,
   ],
-  providers: [AuthService, BcryptService],
+  providers: [AuthService, BcryptService, ...refreshProviders],
   controllers: [AuthController],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
