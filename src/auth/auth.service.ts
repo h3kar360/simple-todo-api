@@ -14,6 +14,7 @@ import { Repository } from 'typeorm';
 import { RefreshToken } from './entities/refreshToken.entity';
 import { randomBytes } from 'crypto';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
+import { AuthOutputVisibleDto } from './dto/authOutputVisible.dto';
 
 @Injectable()
 export class AuthService {
@@ -95,7 +96,9 @@ export class AuthService {
     return await this.jwtService.signAsync(accessTokenPayload);
   }
 
-  async refresh(refreshTokenDto: RefreshTokenDto): Promise<AuthOutputDto> {
+  async refresh(
+    refreshTokenDto: RefreshTokenDto,
+  ): Promise<AuthOutputVisibleDto> {
     const storedRefreshToken = await this.refreshTokensRepository.findOne({
       where: { token: refreshTokenDto.refreshToken, isRevoked: false },
       relations: { user: true },
@@ -121,7 +124,6 @@ export class AuthService {
 
     return {
       accessToken,
-      refreshToken: storedRefreshToken.token,
       userId: signInDataDto.userId,
       username: signInDataDto.username,
     };

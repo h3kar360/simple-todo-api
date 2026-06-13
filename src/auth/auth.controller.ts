@@ -11,6 +11,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthInputDto } from './dto/authInput.dto';
 import type { Response, Request } from 'express';
+import { AuthOutputVisibleDto } from './dto/authOutputVisible.dto';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -20,7 +21,7 @@ export class AuthController {
   async login(
     @Body() authInputDto: AuthInputDto,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<AuthOutputVisibleDto> {
     const result = await this.authService.login(authInputDto);
 
     if (!result) {
@@ -33,6 +34,7 @@ export class AuthController {
     response.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: 'strict',
     });
 
     return { accessToken, userId, username };
@@ -42,7 +44,7 @@ export class AuthController {
   async signup(
     @Body() authInputDto: AuthInputDto,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<AuthOutputVisibleDto> {
     const result = await this.authService.signUp(authInputDto);
 
     if (!result) {
@@ -55,13 +57,14 @@ export class AuthController {
     response.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
+      sameSite: 'strict',
     });
 
     return { accessToken, userId, username };
   }
 
   @Post('refresh')
-  async refresh(@Req() request: Request) {
+  async refresh(@Req() request: Request): Promise<AuthOutputVisibleDto> {
     const refreshToken = request.cookies['refresh_token'];
     return await this.authService.refresh({ refreshToken });
   }
@@ -71,7 +74,7 @@ export class AuthController {
   async logout(
     @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-  ) {
+  ): Promise<{ message: string }> {
     const refreshToken = request.cookies['refresh_token'];
 
     if (refreshToken) {
@@ -79,6 +82,6 @@ export class AuthController {
     }
 
     response.clearCookie('refresh_token');
-    return { message: 'Logged out' };
+    return { message: 'Logged out successfully' };
   }
 }

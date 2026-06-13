@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -10,6 +11,11 @@ import {
 } from '@nestjs/common';
 import { TodosService } from './todos.service';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { CreateTodoControllerDto } from './dto/createTodoController.dto';
+import { UpdateTodoControllerDto } from './dto/updateTodoController.dto';
+import { GetUser } from '../common/decorators/getUser.decorator';
+import { Todo } from './entities/todos.entity';
+import { DeleteTodoResponseDto } from './dto/deleteTodoResponse.dto';
 
 @Controller('/api/v1/todos')
 @UseGuards(AuthGuard)
@@ -17,34 +23,46 @@ export class TodosController {
   constructor(private todosService: TodosService) {}
 
   @Get()
-  findAllByUserId(@Request() request) {
-    const userId = request.user.userId;
+  findAllByUserId(@GetUser('userId') userId: number): Promise<Todo[] | null> {
     return this.todosService.findAllByUserId({ userId });
   }
 
   @Post()
-  createTodo(@Request() request, @Body() input: { title: string }) {
-    const createTodoDto = { userId: request.user.userId, title: input.title };
+  createTodo(
+    @GetUser('userId') userId: number,
+    @Body() createTodoControllerDto: CreateTodoControllerDto,
+  ): Promise<Todo> {
+    const createTodoDto = {
+      userId,
+      title: createTodoControllerDto.title,
+    };
+
     return this.todosService.createTodo(createTodoDto);
   }
 
   @Put(':id')
   updateTodo(
-    @Request() request,
-    @Body() input: { title?: string; isCompleted: boolean },
+    @GetUser('userId') userId: number,
+    @Body() updateTodoControllerDto: UpdateTodoControllerDto,
     @Param('id') todoId: number,
-  ) {
+  ): Promise<Todo | null> {
     const updateTodoDto = {
-      userId: request.user.userId,
+      userId,
       todoId,
-      title: input.title,
-      isCompleted: input.isCompleted,
+      title: updateTodoControllerDto.title,
+      isCompleted: updateTodoControllerDto.isCompleted,
     };
+
     return this.todosService.updateTodo(updateTodoDto);
   }
 
-  @Get('test')
-  sayHello() {
-    return 'hello';
+  @Delete(':id')
+  deleteTodo(
+    @GetUser('userId') userId: number,
+    @Param('id') todoId: number,
+  ): Promise<DeleteTodoResponseDto> {
+    const deleteTodoResponseDto = { userId, todoId };
+
+    return this.todosService.deleteTodo(deleteTodoResponseDto);
   }
 }
