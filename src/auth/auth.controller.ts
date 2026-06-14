@@ -6,6 +6,7 @@ import {
   UseGuards,
   Res,
   Req,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guards/auth.guard';
@@ -18,6 +19,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Post('login')
+  @HttpCode(200)
   async login(
     @Body() authInputDto: AuthInputDto,
     @Res({ passthrough: true }) response: Response,
@@ -64,12 +66,20 @@ export class AuthController {
   }
 
   @Post('refresh')
-  async refresh(@Req() request: Request): Promise<AuthOutputVisibleDto> {
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<AuthOutputVisibleDto> {
     const refreshToken = request.cookies['refresh_token'];
-    return await this.authService.refresh({ refreshToken });
+    const result = await this.authService.refresh({ refreshToken });
+
+    response.status(200);
+
+    return result;
   }
 
   @Post('logout')
+  @HttpCode(200)
   @UseGuards(AuthGuard)
   async logout(
     @Req() request: Request,
