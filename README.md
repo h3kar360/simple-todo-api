@@ -1,8 +1,6 @@
 ## Dokumentasi API
 
-[![Postman Documentation](https://img.shields.io/badge/Postman-Documentation-orange?logo=postman)](https://documenter.getpostman.com/view/55595362/2sBXwtoUbR)
-
-Klik badge di atas untuk melihat dokumentasi API lengkap.
+🔗 [Simple Todo API Docs](https://documenter.getpostman.com/view/55595362/2sBXwtoUbR)
 
 ## Pattern yang Digunakan
 
@@ -38,7 +36,7 @@ Proyek ini menggunakan **Module-based Pattern**, yaitu arsitektur standar NestJS
 
 ### Prasyarat
 
-- **Node.js** (versi 18 atau lebih baru)
+- **Node.js 18+**
 - **Docker** (untuk database PostgreSQL)
 
 ### Langkah-langkah
