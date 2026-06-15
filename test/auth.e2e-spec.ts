@@ -26,30 +26,40 @@ describe('AuthController (e2e)', () => {
       await request(app.getHttpServer())
         .post(SIGNUP_USER_URL)
         .send({
-          username: 'testtestuser4',
+          username: 'testtestuser5',
           password: 'testuser456',
         })
         .expect(201);
     });
 
-    it('should return a 400 for an invalid username', async () => {
+    it('should return a 400 for a username with less than 3 characters', async () => {
       await request(app.getHttpServer())
         .post(SIGNUP_USER_URL)
         .send({
           username: 'ji',
-          password: 'iejkksd',
+          password: 'iejkksde',
         })
         .expect(400);
     });
 
-    it('should return a 400 for a repeated username', async () => {
+    it('should return a 400 for a  password less than 8 characters', async () => {
       await request(app.getHttpServer())
         .post(SIGNUP_USER_URL)
         .send({
           username: 'testuser',
-          password: 'erwjofw',
+          password: 'ered',
         })
         .expect(400);
+    });
+
+    it('should return a 409 for a duplicate username', async () => {
+      await request(app.getHttpServer())
+        .post(SIGNUP_USER_URL)
+        .send({
+          username: 'testuser',
+          password: 'erwjofww',
+        })
+        .expect(409);
     });
   });
 
