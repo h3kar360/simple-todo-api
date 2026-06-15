@@ -1,3 +1,9 @@
+## Dokumentasi API
+
+[![Postman Documentation](https://img.shields.io/badge/Postman-Documentation-orange?logo=postman)](https://documenter.getpostman.com/view/55595362/2sBXwtoUbR)
+
+Klik badge di atas untuk melihat dokumentasi API lengkap.
+
 ## Pattern yang Digunakan
 
 Proyek ini menggunakan **Module-based Pattern**, yaitu arsitektur standar NestJS.
